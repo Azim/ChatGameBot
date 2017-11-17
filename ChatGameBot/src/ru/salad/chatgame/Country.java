@@ -21,6 +21,48 @@ public class Country {
 		this.activeAbilities = activeAbilities;
 		this.passiveAbilities = passiveAbilities;
 	}
+	
+	public boolean canGo(int x1, int y1, int x2, int y2) {
+		
+
+		if(y1==y2) {
+			if(Math.abs(x1-x2)==1) {
+				return true;
+			}
+		}
+		
+		
+		if((x1 % 2 == 0)) {
+			//y
+			//    x-1 x+1
+			//y+1
+			//    x-1 x+1
+			if(y1==y2-1){
+				if(Math.abs(x1-x2)<=1) {
+					return true;
+				}
+			}
+			if(y1 == y2+1) {
+				if(x1==x2) {
+					return true;
+				}
+			}
+			
+		}else {
+			if(y1==y2+1){
+				if(Math.abs(x1-x2)<=1) {
+					return true;
+				}
+			}
+			if(y1 == y2-1) {
+				if(x1==x2) {
+					return true;
+				}
+			}
+			
+		}
+		return false;
+	}
 
 	public String getName() {
 		return name;

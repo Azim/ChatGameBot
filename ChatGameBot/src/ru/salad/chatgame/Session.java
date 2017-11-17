@@ -45,6 +45,9 @@ public class Session {
 		}
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		if(icon != null && x >= 0 && y >= 0) {
+			
+			
+			
 			Graphics2D g = img.createGraphics();
 			g.drawImage(icon,x,y,null);
 			g.dispose();
