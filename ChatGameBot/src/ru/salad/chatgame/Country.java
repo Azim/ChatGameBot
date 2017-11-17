@@ -1,5 +1,6 @@
 package ru.salad.chatgame;
 
+import java.awt.Image;
 import java.util.List;
 
 import ru.salad.chatgame.abilities.ActiveAbility;
@@ -8,11 +9,11 @@ import ru.salad.chatgame.abilities.PassiveAbility;
 public class Country {
 	private Long userId;
 	private String name;
-	private Object icon;//TODO: find out that will be saved as icon
+	private Image icon;//TODO: find out that will be saved as icon
 	private List<ActiveAbility> activeAbilities;
 	private List<PassiveAbility> passiveAbilities;
 	
-	public Country(Long userId, String name, Object icon, List<ActiveAbility> activeAbilities,
+	public Country(Long userId, String name, Image icon, List<ActiveAbility> activeAbilities,
 			List<PassiveAbility> passiveAbilities) {
 		this.userId = userId;
 		this.name = name;
@@ -29,11 +30,11 @@ public class Country {
 		this.name = name;
 	}
 
-	public Object getIcon() {
+	public Image getIcon() {
 		return icon;
 	}
 
-	public void setIcon(Object icon) {
+	public void setIcon(Image icon) {
 		this.icon = icon;
 	}
 
