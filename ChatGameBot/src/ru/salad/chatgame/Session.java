@@ -18,18 +18,30 @@ public class Session {
 	private Long chatId;
 	private String map;
 	
+	
+	
+	
+	public Session(Long chatId, String map) {
+		this.chatId = chatId;
+		if(map==null||map.isEmpty()) {
+			map = "map_basic.jpg";
+		}else {
+			this.map = map;
+		}
+	}
+
 	/** Draws the new object above given image
 	 * 
 	 * @param img - image; set null to get the default image
 	 * @param x x coord - set <0 to draw nothing
 	 * @param y y coord - set <0 to draw nothing
 	 * @param icon object to draw; set null to draw nothing
-	 * @return inputStream with image in it
+	 * @return input stream with image in it
 	 * @throws IOException
 	 */
 	public InputStream drawMap(BufferedImage img, int x, int y, Image icon) throws IOException {
 		if(img == null) {
-			img = ImageIO.read(new File("map_basic.jpg"));
+			img = ImageIO.read(new File(map));
 		}
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		if(icon != null && x >= 0 && y >= 0) {
@@ -42,12 +54,35 @@ public class Session {
 		return is;
 	}
 	
+	
+	/** Draws the new object above given image
+	 * 
+	 * @param is - input stream with image; set null to get the default image
+	 * @param x x coord - set <0 to draw nothing
+	 * @param y y coord - set <0 to draw nothing
+	 * @param icon object to draw; set null to draw nothing
+	 * @return input stream with image in it
+	 * @throws IOException
+	 */
+	public InputStream drawMap(InputStream is, int x, int y, Image icon) throws IOException {
+		BufferedImage img = ImageIO.read(is);
+		return drawMap(img,x,y,icon);
+	}
+	
+	/** Adds player to playerlist.
+	 * 
+	 * @param co player to add
+	 */
 	public void addPlayer(Country co) {
 		if(!this.players.contains(co)) {
 			this.players.add(co);
 		}
 	}
-	
+	/** Removes player from playerlist.
+	 * 
+	 * @param co player toremove
+	 * @return false if player not found, otherwise - true;
+	 */
 	public boolean removePlayer(Country co) {
 		if(this.players.contains(co)) {
 			this.players.remove(co);
