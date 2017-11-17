@@ -22,15 +22,15 @@ public class Country {
 		this.passiveAbilities = passiveAbilities;
 	}
 	
-	public boolean canGo(int x1, int y1, int x2, int y2) {
+	public static boolean canGo(int x1, int y1, int x2, int y2) {
 		
 
+		int dx = Math.abs(x1-x2);
 		if(y1==y2) {
-			if(Math.abs(x1-x2)==1) {
+			if(dx==1) {
 				return true;
 			}
 		}
-		
 		
 		if((x1 % 2 == 0)) {
 			//y
@@ -38,7 +38,7 @@ public class Country {
 			//y+1
 			//    x-1 x+1
 			if(y1==y2-1){
-				if(Math.abs(x1-x2)<=1) {
+				if(dx<=1) {
 					return true;
 				}
 			}
@@ -50,7 +50,7 @@ public class Country {
 			
 		}else {
 			if(y1==y2+1){
-				if(Math.abs(x1-x2)<=1) {
+				if(dx<=1) {
 					return true;
 				}
 			}

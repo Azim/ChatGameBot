@@ -17,6 +17,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+import ru.salad.chatgame.Country;
 import ru.salad.chatgame.util.Config;
 
 public class ChatBot extends TelegramLongPollingBot{
@@ -55,6 +56,24 @@ public class ChatBot extends TelegramLongPollingBot{
 			}else if(text.startsWith("/draw")&&text.contains(":")) {
 
 				String[] cords = text.split(" ")[1].split(":");
+				if(!Country.canGo(3, 3, Integer.valueOf(cords[0]),Integer.valueOf(cords[1]))) {
+					return;
+				}
+				int x =  Integer.valueOf(cords[0]);
+
+				int y; //= Integer.valueOf(cords[1]);//24;
+				if(x%2==0) {
+					x = x*41+26;
+					y = 44;
+				}else {
+					x = x*41+46;
+					y = 32;
+				}
+				if(Integer.valueOf(cords[1])%2==0) {
+					y = y + 47*Integer.valueOf(cords[1]);
+				}else {
+					y = y+24 + 47*(Integer.valueOf(cords[1])-1);
+				}
 				InputStream is = drawSymbol(Integer.valueOf(cords[0]),Integer.valueOf(cords[1]),cords[2],Color.red);
 				if(is == null) return;
 				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
