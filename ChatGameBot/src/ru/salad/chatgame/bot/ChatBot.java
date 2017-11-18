@@ -55,26 +55,30 @@ public class ChatBot extends TelegramLongPollingBot{
 				
 			}else if(text.startsWith("/draw")&&text.contains(":")) {
 
-				String[] cords = text.split(" ")[1].split(":");
-				if(!Country.canGo(3, 3, Integer.valueOf(cords[0]),Integer.valueOf(cords[1]))) {
+				String[] data = text.split(" ")[1].split(":");
+				if(data.length!=3) {
 					return;
 				}
-				int x =  Integer.valueOf(cords[0]);
+					
+				if(!Country.canGo(3, 3, Integer.valueOf(data[0]),Integer.valueOf(data[1]))) {
+					return;
+				}
+				int x =  Integer.valueOf(data[0]);
 
 				int y; //= Integer.valueOf(cords[1]);//24;
 				if(x%2==0) {
-					x = x*41+26;
+					x = x*41/2+26;
 					y = 44;
 				}else {
-					x = x*41+46;
+					x = (x-1)/2*41+46;
 					y = 32;
 				}
-				if(Integer.valueOf(cords[1])%2==0) {
-					y = y + 47*Integer.valueOf(cords[1]);
+				if(Integer.valueOf(data[1])%2==0) {
+					y = y  + 47*Integer.valueOf(data[1])/2;
 				}else {
-					y = y+24 + 47*(Integer.valueOf(cords[1])-1);
+					y = y + 24 + 47*(Integer.valueOf(data[1])-1)/2;
 				}
-				InputStream is = drawSymbol(Integer.valueOf(cords[0]),Integer.valueOf(cords[1]),cords[2],Color.red);
+				InputStream is = drawSymbol(x,y,data[2],Color.red);
 				if(is == null) return;
 				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
 				try {
@@ -99,7 +103,7 @@ public class ChatBot extends TelegramLongPollingBot{
 	
 	private InputStream drawSymbol(int x, int y, String symbols, Color color) {
 		try {
-			BufferedImage img = ImageIO.read(new File("map_basic.jpg"));
+			BufferedImage img = ImageIO.read(new File("map_basic_num.jpg"));
 
 			// Obtain the Graphics2D context associated with the BufferedImage.
 			Graphics2D g = img.createGraphics();
@@ -109,7 +113,8 @@ public class ChatBot extends TelegramLongPollingBot{
 
 			//g.drawLine(42, 14, 80, 80);
 			//g.drawLine(80, 80, 118, 145);
-			g.drawString(symbols,x,y);
+			//g.drawString(symbols,x,y);
+			g.drawLine(x, y, x+10, y+10);
 		// Clean up -- dispose the graphics context that was created.
 			g.dispose();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
