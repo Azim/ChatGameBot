@@ -16,16 +16,16 @@ import javax.imageio.ImageIO;
 public class Session {
 	private List<Country> players = new ArrayList<Country>();
 	private Long chatId;
-	private String map;
-	
+	private String mapName;
+	private BufferedImage map;
 	
 	public Session(Long chatId, String map) {
 		this.chatId = chatId;
-		if(map==null||map.isEmpty()) {
-			map = "map_basic.jpg";
-		}else {
-			this.map = map;
-		}
+		this.mapName = map;
+	}
+	
+	public Session(Long chatId) {
+		this(chatId,"map_basic.jpg");
 	}
 
 	/** Draws the new object above given image
@@ -37,37 +37,30 @@ public class Session {
 	 * @return input stream with image in it
 	 * @throws IOException
 	 */
-	public InputStream drawMap(BufferedImage img, int x, int y, Image icon) throws IOException {
-		if(img == null) {
-			img = ImageIO.read(new File("images/"+map));
-		}
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
+	public BufferedImage drawImageOnMap(int x, int y, Image icon) throws IOException {
+
 		if(icon != null && x >= 0 && y >= 0) {
 			
-			
-			
-			Graphics2D g = img.createGraphics();
+			Graphics2D g = this.map.createGraphics();
 			g.drawImage(icon,x,y,null);
 			g.dispose();
 		}
-		ImageIO.write(img, "jpg", os); 
+		return this.map;
+	}
+	
+	public InputStream getCurrentMapAsStream() throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ImageIO.write(this.map, "jpg", os); 
 		InputStream is = new ByteArrayInputStream(os.toByteArray());
+		os.close();
 		return is;
 	}
 	
-	
-	/** Draws the new object above given image
-	 * 
-	 * @param is - input stream with image; set null to get the default image
-	 * @param x x coord - set <0 to draw nothing
-	 * @param y y coord - set <0 to draw nothing
-	 * @param icon object to draw; set null to draw nothing
-	 * @return input stream with image in it
-	 * @throws IOException
-	 */
-	public InputStream drawMap(InputStream is, int x, int y, Image icon) throws IOException {
-		BufferedImage img = ImageIO.read(is);
-		return drawMap(img,x,y,icon);
+	public BufferedImage getCurrentMap() throws IOException {
+		if(this.map == null) {
+			this.map = ImageIO.read(new File("images/"+mapName));
+		}
+		return this.map;
 	}
 	
 	/** Adds player to playerlist.
