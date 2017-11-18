@@ -19,8 +19,6 @@ public class Session {
 	private String map;
 	
 	
-	
-	
 	public Session(Long chatId, String map) {
 		this.chatId = chatId;
 		if(map==null||map.isEmpty()) {
@@ -41,7 +39,7 @@ public class Session {
 	 */
 	public InputStream drawMap(BufferedImage img, int x, int y, Image icon) throws IOException {
 		if(img == null) {
-			img = ImageIO.read(new File(map));
+			img = ImageIO.read(new File("images/"+map));
 		}
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		if(icon != null && x >= 0 && y >= 0) {
@@ -93,4 +91,14 @@ public class Session {
 		}
 		return false;
 	}
+	
+	
+	/** Get the session's chat id
+	 * 
+	 * @return Long chat id
+	 */
+	public Long getChatId() {
+		return this.chatId;
+	}
+	
 }

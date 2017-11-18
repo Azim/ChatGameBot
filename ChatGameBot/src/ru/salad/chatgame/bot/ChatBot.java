@@ -103,7 +103,7 @@ public class ChatBot extends TelegramLongPollingBot{
 	
 	private InputStream drawSymbol(int x, int y, String symbols, Color color) {
 		try {
-			BufferedImage img = ImageIO.read(new File("map_basic_num.jpg"));
+			BufferedImage img = ImageIO.read(new File("images/map_basic_num.jpg"));
 
 			// Obtain the Graphics2D context associated with the BufferedImage.
 			Graphics2D g = img.createGraphics();
