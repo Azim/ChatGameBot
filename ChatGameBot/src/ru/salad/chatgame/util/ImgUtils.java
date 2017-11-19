@@ -27,4 +27,30 @@ public class ImgUtils {
 		}
 		return dst;
 	}
+	/** transforms coords from cell x:y to pixel x:y
+	 * 
+	 * @param x - x coord
+	 * @param y - y coord
+	 * @return int[x,y] - transformed coords
+	 */
+	public static int[] transformCoords(int x, int y) {
+		int[] data = {x,y};
+		
+		if(x%2==0) {
+			x = x*41/2+26;
+			y = 44;
+		}else {
+			x = (x-1)/2*41+46;
+			y = 32;
+		}
+		if(Integer.valueOf(data[1])%2==0) {
+			y = y  + 47*Integer.valueOf(data[1])/2;
+		}else {
+			y = y + 24 + 47*(Integer.valueOf(data[1])-1)/2;
+		}
+		data[0]=x;
+		data[1]=y;
+		
+		return data;
+	}
 }
