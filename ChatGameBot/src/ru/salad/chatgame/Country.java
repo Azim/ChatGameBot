@@ -33,10 +33,14 @@ public class Country {
 		}
 		
 		if((x1 % 2 == 0)) {
-			//y
-			//    x-1 x+1
-			//y+1
-			//    x-1 x+1
+			if(((y1==y2-1)&&(dx<=1))||((y1 == y2+1)&&(x1==x2))){
+					return true;
+			}
+		}else {
+			if(((y1==y2+1)&&(dx<=1))||((y1 == y2-1)&&(x1==x2))) {
+				return true;
+			}
+			/* 
 			if(y1==y2-1){
 				if(dx<=1) {
 					return true;
@@ -48,7 +52,8 @@ public class Country {
 				}
 			}
 			
-		}else {
+			}else{
+			
 			if(y1==y2+1){
 				if(dx<=1) {
 					return true;
@@ -59,7 +64,7 @@ public class Country {
 					return true;
 				}
 			}
-			
+			*/
 		}
 		return false;
 	}

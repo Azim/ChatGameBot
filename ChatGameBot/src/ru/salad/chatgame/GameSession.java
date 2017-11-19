@@ -15,18 +15,20 @@ import javax.imageio.ImageIO;
 
 import ru.salad.chatgame.util.ImgUtils;
 
-public class Session {
+public class GameSession {
 	private List<Country> players = new ArrayList<Country>();
 	private Long chatId;
 	private String mapName;
 	private BufferedImage map;
+	private int[][] location;
 	
-	public Session(Long chatId, String map) {
+	public GameSession(Long chatId, String map) {
 		this.chatId = chatId;
 		this.mapName = map;
+		this.location = new int[48][30];
 	}
 	
-	public Session(Long chatId) {
+	public GameSession(Long chatId) {
 		this(chatId,"map_basic.jpg");
 	}
 
@@ -70,6 +72,9 @@ public class Session {
 		return this.map;
 	}
 	
+	
+	
+	
 	/** Adds player to playerlist.
 	 * 
 	 * @param co player to add
@@ -91,8 +96,6 @@ public class Session {
 		}
 		return false;
 	}
-	
-	
 	/** Get the session's chat id
 	 * 
 	 * @return Long chat id
@@ -100,5 +103,4 @@ public class Session {
 	public Long getChatId() {
 		return this.chatId;
 	}
-	
 }

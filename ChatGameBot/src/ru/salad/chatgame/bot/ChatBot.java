@@ -8,6 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -18,21 +20,23 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import ru.salad.chatgame.Country;
+import ru.salad.chatgame.GameSession;
 import ru.salad.chatgame.util.Config;
 import ru.salad.chatgame.util.ImgUtils;
 
 public class ChatBot extends TelegramLongPollingBot{
 	private final String botUsername;
 	private final String botToken;
+	private List<GameSession> sessions;
 	
 	public ChatBot(String botUsername, String botToken) {
 		this.botUsername = botUsername;
 		this.botToken = botToken;
+		this.sessions = new ArrayList<GameSession>();
 	}
 
 	public ChatBot(Config config) {
-		this.botUsername = config.getBotUsername();
-		this.botToken = config.getBotToken();
+		this(config.getBotUsername(),config.getBotToken());
 	}
 
 
@@ -74,6 +78,9 @@ public class ChatBot extends TelegramLongPollingBot{
 				} catch (TelegramApiException e) {
 					e.printStackTrace();
 				}
+			}else if(text.toLowerCase().startsWith("/newsession")) {
+				GameSession ses = new GameSession(update.getMessage().getChatId());
+				this.sessions.add(ses);
 			}
 		}
 	}
