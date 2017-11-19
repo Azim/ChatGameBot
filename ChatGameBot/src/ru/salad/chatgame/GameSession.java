@@ -20,12 +20,17 @@ public class GameSession {
 	private Long chatId;
 	private String mapName;
 	private BufferedImage map;
-	private int[][] location;
+	private Long[][] location;
 	
 	public GameSession(Long chatId, String map) {
 		this.chatId = chatId;
 		this.mapName = map;
-		this.location = new int[48][30];
+		this.location = new Long[48][30];
+		for(int i=0;i<this.location.length;i++) {
+			for(int j=0;j<this.location[0].length;j++) {
+				location[i][j]=0L;
+			}
+		}
 	}
 	
 	public GameSession(Long chatId) {

@@ -64,7 +64,9 @@ public class ChatBot extends TelegramLongPollingBot{
 				if(data.length!=3) {
 					return;
 				}
-					
+				
+				
+				
 				if(!Country.canGo(3, 3, Integer.valueOf(data[1]),Integer.valueOf(data[2]))) {
 					return;
 				}
@@ -80,6 +82,7 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 			}else if(text.toLowerCase().startsWith("/newsession")) {
 				GameSession ses = new GameSession(update.getMessage().getChatId());
+				
 				this.sessions.add(ses);
 			}
 		}
