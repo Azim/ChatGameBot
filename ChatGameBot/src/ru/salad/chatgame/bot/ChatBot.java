@@ -40,7 +40,7 @@ public class ChatBot extends TelegramLongPollingBot{
 		if(update.hasMessage()&&update.getMessage().hasText()) {
 			String text = update.getMessage().getText();
 			if(text.startsWith("/next")){
-				InputStream is = drawSymbol(0,0," ",Color.red);
+				InputStream is = drawSymbol(0,0,Color.red);
 				SendMessage msg = new SendMessage().setChatId(update.getMessage().getChatId()).setText("ХОД-1 (@username)");
 				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("предстоящие события, \nнесколько \nстрок, вроде максимум - 4000 символов");
 				try {
@@ -53,17 +53,17 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 				
 				
-			}else if(text.startsWith("/draw")&&text.contains(":")) {
+			}else if(text.startsWith("/draw")) {
 
-				String[] data = text.split(" ")[1].split(":");
+				String[] data = text.split(" ");
 				if(data.length!=3) {
 					return;
 				}
 					
-				if(!Country.canGo(3, 3, Integer.valueOf(data[0]),Integer.valueOf(data[1]))) {
+				if(!Country.canGo(3, 3, Integer.valueOf(data[1]),Integer.valueOf(data[2]))) {
 					return;
 				}
-				int x =  Integer.valueOf(data[0]);
+				int x =  Integer.valueOf(data[1]);
 
 				int y; //= Integer.valueOf(cords[1]);//24;
 				if(x%2==0) {
@@ -73,12 +73,12 @@ public class ChatBot extends TelegramLongPollingBot{
 					x = (x-1)/2*41+46;
 					y = 32;
 				}
-				if(Integer.valueOf(data[1])%2==0) {
-					y = y  + 47*Integer.valueOf(data[1])/2;
+				if(Integer.valueOf(data[2])%2==0) {
+					y = y  + 47*Integer.valueOf(data[2])/2;
 				}else {
-					y = y + 24 + 47*(Integer.valueOf(data[1])-1)/2;
+					y = y + 24 + 47*(Integer.valueOf(data[2])-1)/2;
 				}
-				InputStream is = drawSymbol(x,y,data[2],Color.red);
+				InputStream is = drawSymbol(x,y,Color.red);
 				if(is == null) return;
 				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
 				try {
@@ -101,24 +101,16 @@ public class ChatBot extends TelegramLongPollingBot{
 	}
 	
 	
-	private InputStream drawSymbol(int x, int y, String symbols, Color color) {
+	private InputStream drawSymbol(int x, int y, Color color) {
 		try {
 			BufferedImage img = ImageIO.read(new File("images/map_basic_num.jpg"));
 
-			// Obtain the Graphics2D context associated with the BufferedImage.
 			Graphics2D g = img.createGraphics();
 			g.setColor(color);
-			// Draw on the BufferedImage via the graphics context.
-			//g.drawOval(50, 50, 12, 12);
-
-			//g.drawLine(42, 14, 80, 80);
-			//g.drawLine(80, 80, 118, 145);
-			//g.drawString(symbols,x,y);
-			g.drawLine(x, y, x+10, y+10);
-		// Clean up -- dispose the graphics context that was created.
+			g.drawLine(x, y, x+26, y+23);
+			g.drawLine(x+26, y, x, y+23);
 			g.dispose();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			
 			ImageIO.write(img, "jpg", os);
 			InputStream is = new ByteArrayInputStream(os.toByteArray());
 			return is;

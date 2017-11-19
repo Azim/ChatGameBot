@@ -13,6 +13,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import ru.salad.chatgame.util.ImgUtils;
+
 public class Session {
 	private List<Country> players = new ArrayList<Country>();
 	private Long chatId;
@@ -38,11 +40,16 @@ public class Session {
 	 * @throws IOException
 	 */
 	public BufferedImage drawImageOnMap(int x, int y, Image icon) throws IOException {
-
-		if(icon != null && x >= 0 && y >= 0) {
+		BufferedImage transparentWhite = ImgUtils.makeWhiteTransparent(icon);
+		
+		
+		if(icon != null && x >= 0 && y >= 0 &&
+				(x+transparentWhite.getWidth()<this.map.getWidth()) &&
+				(y+transparentWhite.getHeight()<this.map.getHeight())
+				) {
 			
 			Graphics2D g = this.map.createGraphics();
-			g.drawImage(icon,x,y,null);
+			g.drawImage(transparentWhite,x,y,null);
 			g.dispose();
 		}
 		return this.map;
