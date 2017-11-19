@@ -13,7 +13,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import ru.salad.chatgame.util.ImgUtils;
+import ru.salad.chatgame.util.Utils;
 
 public class GameSession {
 	private List<Country> players = new ArrayList<Country>();
@@ -47,7 +47,7 @@ public class GameSession {
 	 * @throws IOException
 	 */
 	public BufferedImage drawImageOnMap(int x, int y, Image icon) throws IOException {
-		BufferedImage transparentWhite = ImgUtils.makeWhiteTransparent(icon);
+		BufferedImage transparentWhite = Utils.makeWhiteTransparent(icon);
 		
 		
 		if(icon != null && x >= 0 && y >= 0 &&

@@ -22,7 +22,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.salad.chatgame.Country;
 import ru.salad.chatgame.GameSession;
 import ru.salad.chatgame.util.Config;
-import ru.salad.chatgame.util.ImgUtils;
+import ru.salad.chatgame.util.Utils;
 
 public class ChatBot extends TelegramLongPollingBot{
 	private final String botUsername;
@@ -44,7 +44,7 @@ public class ChatBot extends TelegramLongPollingBot{
 	public void onUpdateReceived(Update update) {
 		if(update.hasMessage()&&update.getMessage().hasText()) {
 			String text = update.getMessage().getText();
-			if(text.startsWith("/next")){
+			/*if(text.startsWith("/next")){
 				InputStream is = drawSymbol(0,0,Color.red);
 				SendMessage msg = new SendMessage().setChatId(update.getMessage().getChatId()).setText("ХОД-1 (@username)");
 				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("предстоящие события, \nнесколько \nстрок, вроде максимум - 4000 символов");
@@ -58,7 +58,7 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 				
 				
-			}else if(text.startsWith("/draw")) {
+			}else */if(text.startsWith("/draw")) {
 
 				String[] data = text.split(" ");
 				if(data.length!=3) {
@@ -71,8 +71,8 @@ public class ChatBot extends TelegramLongPollingBot{
 					return;
 				}
 
-				int[]cords = ImgUtils.transformCoords(Integer.valueOf(data[1]), Integer.valueOf(data[2]));
-				InputStream is = drawSymbol(cords[0],cords[1],Color.red);
+				int[]cords = Utils.transformCoords(Integer.valueOf(data[1]), Integer.valueOf(data[2]));
+				InputStream is = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
 				if(is == null) return;
 				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
 				try {
@@ -99,9 +99,10 @@ public class ChatBot extends TelegramLongPollingBot{
 	}
 	
 	
-	private InputStream drawSymbol(int x, int y, Color color) {
+	private InputStream drawSymbol(GameSession s,int x, int y, Color color) {
 		try {
-			BufferedImage img = ImageIO.read(new File("images/map_basic_num.jpg"));
+			BufferedImage img = s.getCurrentMap();
+			//BufferedImage img = ImageIO.read(new File("images/map_basic_num.jpg"));
 
 			Graphics2D g = img.createGraphics();
 			g.setColor(color);

@@ -3,8 +3,11 @@ package ru.salad.chatgame.util;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
-public class ImgUtils {
+import ru.salad.chatgame.GameSession;
+
+public class Utils {
 	 /** makes all white pixels transparent
 	  * 
 	  * @param img 
@@ -53,4 +56,15 @@ public class ImgUtils {
 		
 		return data;
 	}
+	
+	public static GameSession getSessionById(List<GameSession> sessions,Long id) {
+		for(GameSession session:sessions) {
+			if(session.getChatId().equals(id)) {
+				return session;
+			}
+		}
+		return null;
+		
+	}
+	
 }
