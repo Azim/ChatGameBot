@@ -23,7 +23,7 @@ public class GameSession {
 	private Long[][] location;
 	private Country turn; 
 	
-	public GameSession(Long chatId, String map) {
+	public GameSession(Long chatId, String map) throws IOException {
 		this.chatId = chatId;
 		this.mapName = map;
 		this.location = new Long[48][30];
@@ -32,9 +32,10 @@ public class GameSession {
 				location[i][j]=0L;
 			}
 		}
+		this.map = ImageIO.read(new File("images/"+map));
 	}
 	
-	public GameSession(Long chatId) {
+	public GameSession(Long chatId) throws IOException {
 		this(chatId,"map_basic.jpg");
 	}
 
@@ -52,7 +53,8 @@ public class GameSession {
 		
 		
 		if(icon != null && x >= 0 && y >= 0 &&
-				(x+transparentWhite.getWidth()<this.map.getWidth()) &&
+				(x+transparentWhite.getWidth()<
+						this.map.getWidth()) &&
 				(y+transparentWhite.getHeight()<this.map.getHeight())
 				) {
 			

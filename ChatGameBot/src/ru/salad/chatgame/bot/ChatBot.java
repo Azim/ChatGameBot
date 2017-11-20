@@ -84,11 +84,16 @@ public class ChatBot extends TelegramLongPollingBot{
 						pl.addCell(toGo);
 						
 						int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
-						InputStream is = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
-					
+						InputStream is = null;//drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
+						try {
+							session.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/2nd.jpg")));
+							is = session.getCurrentMapAsStream();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 						if(is == null) return;
 					
-						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
+						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("X: "+toGo.getX()+"\nY: "+toGo.getY());
 						try {
 							sendPhoto(map);
 						} catch (TelegramApiException e) {
@@ -102,9 +107,16 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 			}else if(text.toLowerCase().startsWith("/newsession")) {
 				if(!Utils.containsSessionWithId(sessions, chatId)) {
-					GameSession ses = new GameSession(update.getMessage().getChatId());
+					GameSession ses;
+					try {
+						ses = new GameSession(update.getMessage().getChatId());
 					this.sessions.add(ses);
 					System.out.println("added session "+chatId);
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}else if(text.toLowerCase().startsWith("/joingame")) {
 				if(Utils.containsSessionWithId(sessions, chatId)) {
@@ -119,14 +131,19 @@ public class ChatBot extends TelegramLongPollingBot{
 						System.out.println("added player "+fromId+" to session "+chatId+" with starting pos '"+sc.getX()+"' & '"+sc.getY()+"'");
 						
 						int[]cords = Utils.transformCoords(sc.getX(), sc.getY());
-						InputStream is = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.GREEN);
-					
+						InputStream is = null;// = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.GREEN);
+						try {
+							ses.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/start.jpg")));
+							is = ses.getCurrentMapAsStream();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 						if(is == null) {
 							System.out.println("empty image");
 							return;
 						}
 					
-						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
+						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("X: "+sc.getX()+"\nY: "+sc.getY());
 						try {
 							sendPhoto(map);
 						} catch (TelegramApiException e) {
