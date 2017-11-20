@@ -65,59 +65,78 @@ public class ChatBot extends TelegramLongPollingBot{
 				
 			}else */
 			if(text.startsWith("/go")) {
+				SendMessage msg = new SendMessage().setChatId(chatId);
 				if(Utils.containsSessionWithId(sessions, chatId)) {
-				GameSession session = Utils.getSessionById(sessions, chatId);
+					GameSession session = Utils.getSessionById(sessions, chatId);
 				
 					if(session.containsPlayer(fromId)) {
-						Country pl = session.getPlayerById(fromId);
-						String[] data = text.split(" ");
-						if(data.length!=3) {
-							return;
-						}
-						Cell toGo = new Cell(Integer.valueOf(data[1]), Integer.valueOf(data[2]));
+						if(session.getCurrentTurn().getUserId()==fromId) {
+							Country pl = session.getPlayerById(fromId);
+							String[] data = text.split(" ");
+							if(data.length<3) {
+								return;
+							}
+							Cell toGo = new Cell(Integer.valueOf(data[1]), Integer.valueOf(data[2]));
 						
-						if(!pl.canGo(toGo.getX(),toGo.getY())) {
-							System.out.println("can't go");
-							return;
-						}
+							if(!pl.canGo(toGo.getX(),toGo.getY())) {
+								System.out.println("can't go");
+
+								msg.setText("Can't go there!");
+								return;
+							}
 						
-						pl.addCell(toGo);
+							pl.addCell(toGo);
 						
-						int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
-						InputStream is = null;//drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
-						try {
-							session.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/2nd.jpg")));
-							is = session.getCurrentMapAsStream();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-						if(is == null) return;
+							int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
+							InputStream is = null;//drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
+							try {
+								session.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/2nd.jpg")));
+								is = session.getCurrentMapAsStream();
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							if(is == null) return;
 					
-						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("X: "+toGo.getX()+"\nY: "+toGo.getY());
-						try {
-							sendPhoto(map);
-						} catch (TelegramApiException e) {
-							e.printStackTrace();
+							SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("X: "+toGo.getX()+"\nY: "+toGo.getY());
+							session.nextTurn();
+							try {
+								sendPhoto(map);
+							} catch (TelegramApiException e) {
+								e.printStackTrace();
+							}
+						}else {
+							msg.setText("It's not your turn!");
 						}
 					}else {
-						//not a player
+						msg.setText("You must join the game first\nTo do so, use /joingame");
 					}
 				}else {
-					//create new game first
+					msg.setText("Here are no game running now\nTo start one, use /newgame");
 				}
-			}else if(text.toLowerCase().startsWith("/newsession")) {
-				if(!Utils.containsSessionWithId(sessions, chatId)) {
+				
+				try {
+					execute(msg);
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
+			}else if(text.toLowerCase().startsWith("/newgame")) {
+				try {
 					GameSession ses;
-					try {
-						ses = new GameSession(update.getMessage().getChatId());
-					this.sessions.add(ses);
-					System.out.println("added session "+chatId);
-
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					ses = new GameSession(update.getMessage().getChatId());
+					SendMessage msg = new SendMessage().setChatId(chatId);
+					if(!Utils.containsSessionWithId(sessions, chatId)) {
+						this.sessions.add(ses);
+						System.out.println("added session "+chatId);
+						msg.setText("Created a new game! To join it, use /joingame");
+					}else {
+						this.sessions.remove(Utils.getSessionById(sessions, chatId));
+						msg.setText("Game was reset!");
 					}
+					execute(msg);
+				} catch (IOException | TelegramApiException e) {
+					e.printStackTrace();
 				}
+				
 			}else if(text.toLowerCase().startsWith("/joingame")) {
 				if(Utils.containsSessionWithId(sessions, chatId)) {
 					GameSession ses = Utils.getSessionById(sessions, chatId);
@@ -143,7 +162,7 @@ public class ChatBot extends TelegramLongPollingBot{
 							return;
 						}
 					
-						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("X: "+sc.getX()+"\nY: "+sc.getY());
+						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("Joined the game! your spawn location is:\nX: "+sc.getX()+"\nY: "+sc.getY()+"\n\nUse /go X Y to expand");
 						try {
 							sendPhoto(map);
 						} catch (TelegramApiException e) {
@@ -151,7 +170,19 @@ public class ChatBot extends TelegramLongPollingBot{
 						}
 						
 					}else {
-						//already exists
+						SendMessage msg = new SendMessage().setChatId(chatId).setText("You are already in game");
+						try {
+							execute(msg);
+						} catch (TelegramApiException e) {
+							e.printStackTrace();
+						}
+					}
+				}else {
+					SendMessage msg = new SendMessage().setChatId(chatId).setText("Here are no running game right now, you can create new one using command '/newgame'");
+					try {
+						execute(msg);
+					} catch (TelegramApiException e) {
+						e.printStackTrace();
 					}
 				}
 			}
@@ -172,7 +203,6 @@ public class ChatBot extends TelegramLongPollingBot{
 	private InputStream drawSymbol(GameSession s,int x, int y, Color color) {
 		try {
 			BufferedImage img = s.getCurrentMap();
-			//BufferedImage img = ImageIO.read(new File("images/map_basic_num.jpg"));
 
 			Graphics2D g = img.createGraphics();
 			g.setColor(color);

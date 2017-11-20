@@ -39,6 +39,16 @@ public class GameSession {
 		this(chatId,"map_basic.jpg");
 	}
 
+	public void nextTurn() {
+		int currentIndex = this.players.indexOf(this.turn);
+		if(currentIndex+1 >= this.players.size()) {
+			currentIndex = 0;
+		}else {
+			currentIndex++;
+		}
+		this.turn = this.players.get(currentIndex);
+	}
+
 	/** Draws the new object above given image
 	 * 
 	 * @param img - image; set null to get the default image
@@ -50,29 +60,39 @@ public class GameSession {
 	 */
 	public BufferedImage drawImageOnMap(int x, int y, Image icon) throws IOException {
 		BufferedImage transparentWhite = Utils.makeWhiteTransparent(icon);
-		
+		BufferedImage tmap = getCurrentMap();
 		
 		if(icon != null && x >= 0 && y >= 0 &&
 				(x+transparentWhite.getWidth()<
-						this.map.getWidth()) &&
-				(y+transparentWhite.getHeight()<this.map.getHeight())
+						tmap.getWidth()) &&
+				(y+transparentWhite.getHeight()<tmap.getHeight())
 				) {
 			
-			Graphics2D g = this.map.createGraphics();
+			Graphics2D g = tmap.createGraphics();
 			g.drawImage(transparentWhite,x,y,null);
 			g.dispose();
+			this.map = tmap;
 		}
 		return this.map;
 	}
-	
+	/** Returns current map as InputStream; if not created, generates new one;
+	 * 
+	 * @return InputStream map 
+	 * @throws IOException
+	 */
 	public InputStream getCurrentMapAsStream() throws IOException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(this.map, "jpg", os); 
+		ImageIO.write(this.getCurrentMap(), "jpg", os); 
 		InputStream is = new ByteArrayInputStream(os.toByteArray());
 		os.close();
 		return is;
 	}
 	
+	/** Returns current map as BufferedImage; if not created, generates new one;
+	 * 
+	 * @return BufferedImage map
+	 * @throws IOException - no file found
+	 */
 	public BufferedImage getCurrentMap() throws IOException {
 		if(this.map == null) {
 			this.map = ImageIO.read(new File("images/"+mapName));
@@ -87,6 +107,13 @@ public class GameSession {
 			}
 		}
 		return false;
+	}
+	
+	public Country getCurrentTurn() {
+		if(this.turn == null&&!this.players.isEmpty()) {
+			this.turn = this.players.get(0);
+		}
+		return this.turn;
 	}
 	
 	public Country getPlayerById(Integer id) {
