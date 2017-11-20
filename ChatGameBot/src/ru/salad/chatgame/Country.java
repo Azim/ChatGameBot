@@ -30,6 +30,9 @@ public class Country {
 	
 	public boolean canGo(int x2, int y2) {
 		for(Cell loc:this.cells) {
+			if(loc.getX()==x2&&loc.getY()==y2) {
+				continue;
+			}
 			int x1 = loc.getX();
 			int y1 = loc.getY();
 			int dx = Math.abs(x1-x2);
