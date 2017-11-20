@@ -1,70 +1,62 @@
 package ru.salad.chatgame;
 
 import java.awt.Image;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import ru.salad.chatgame.abilities.ActiveAbility;
 import ru.salad.chatgame.abilities.PassiveAbility;
+import ru.salad.chatgame.util.Cell;
 
 public class Country {
-	private Long userId;
+	private int userId;
 	private String name;
 	private Image icon;//TODO: find out that will be saved as icon
 	private List<ActiveAbility> activeAbilities;
 	private List<PassiveAbility> passiveAbilities;
+	private List<Cell> cells;
 	
-	public Country(Long userId, String name, Image icon, List<ActiveAbility> activeAbilities,
-			List<PassiveAbility> passiveAbilities) {
+	public Country(int userId, String name, Image icon, List<ActiveAbility> activeAbilities,
+			List<PassiveAbility> passiveAbilities, Cell startingCell) {
 		this.userId = userId;
 		this.name = name;
 		this.icon = icon;
 		this.activeAbilities = activeAbilities;
 		this.passiveAbilities = passiveAbilities;
+		this.cells = new ArrayList<Cell>();
+		this.cells.add(startingCell);
 	}
 	
-	public static boolean canGo(int x1, int y1, int x2, int y2) {
+	public boolean canGo(int x2, int y2) {
+		for(Cell loc:this.cells) {
+			int x1 = loc.getX();
+			int y1 = loc.getY();
+			int dx = Math.abs(x1-x2);
+			if(y1==y2) {
+				if(dx==1) {
+					return true;
+				}
+			}
 		
-
-		int dx = Math.abs(x1-x2);
-		if(y1==y2) {
-			if(dx==1) {
-				return true;
-			}
-		}
-		
-		if((x1 % 2 == 0)) {
-			if(((y1==y2-1)&&(dx<=1))||((y1 == y2+1)&&(x1==x2))){
-					return true;
-			}
-		}else {
-			if(((y1==y2+1)&&(dx<=1))||((y1 == y2-1)&&(x1==x2))) {
-				return true;
-			}
-			/* 
-			if(y1==y2-1){
-				if(dx<=1) {
+			if((x1 % 2 == 0)) {
+				if(((y1==y2-1)&&(dx<=1))||((y1 == y2+1)&&(x1==x2))){
 					return true;
 				}
-			}
-			if(y1 == y2+1) {
-				if(x1==x2) {
+			} else {
+				if (((y1 == y2 + 1) && (dx <= 1)) || ((y1 == y2 - 1) && (x1 == x2))) {
 					return true;
 				}
+				/*
+				 * if(y1==y2-1){ if(dx<=1) { return true; } } if(y1 == y2+1) { if(x1==x2) {
+				 * return true; } }
+				 * 
+				 * }else{
+				 * 
+				 * if(y1==y2+1){ if(dx<=1) { return true; } } if(y1 == y2-1) { if(x1==x2) {
+				 * return true; } }
+				 */
 			}
-			
-			}else{
-			
-			if(y1==y2+1){
-				if(dx<=1) {
-					return true;
-				}
-			}
-			if(y1 == y2-1) {
-				if(x1==x2) {
-					return true;
-				}
-			}
-			*/
 		}
 		return false;
 	}
@@ -85,7 +77,7 @@ public class Country {
 		this.icon = icon;
 	}
 
-	public Long getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
@@ -109,6 +101,16 @@ public class Country {
 		if(!this.passiveAbilities.contains(pa)) {
 			this.passiveAbilities.add(pa);
 			return true;
+		}
+		return false;
+	}
+	
+	public List<Cell> getCells(){
+		return this.cells;
+	}
+	public boolean addCell(Cell c) {
+		if(!this.cells.contains(c)) {
+			this.cells.add(c);
 		}
 		return false;
 	}

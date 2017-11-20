@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -21,6 +22,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import ru.salad.chatgame.Country;
 import ru.salad.chatgame.GameSession;
+import ru.salad.chatgame.util.Cell;
 import ru.salad.chatgame.util.Config;
 import ru.salad.chatgame.util.Utils;
 
@@ -44,6 +46,9 @@ public class ChatBot extends TelegramLongPollingBot{
 	public void onUpdateReceived(Update update) {
 		if(update.hasMessage()&&update.getMessage().hasText()) {
 			String text = update.getMessage().getText();
+			Long chatId = update.getMessage().getChatId();
+			Integer fromId = update.getMessage().getFrom().getId();
+			Integer messageId = update.getMessage().getMessageId();
 			/*if(text.startsWith("/next")){
 				InputStream is = drawSymbol(0,0,Color.red);
 				SendMessage msg = new SendMessage().setChatId(update.getMessage().getChatId()).setText("унд-1 (@username)");
@@ -58,32 +63,80 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 				
 				
-			}else */if(text.startsWith("/draw")) {
-
-				String[] data = text.split(" ");
-				if(data.length!=3) {
-					return;
-				}
+			}else */
+			if(text.startsWith("/go")) {
+				if(Utils.containsSessionWithId(sessions, chatId)) {
+				GameSession session = Utils.getSessionById(sessions, chatId);
 				
-				
-				
-				if(!Country.canGo(3, 3, Integer.valueOf(data[1]),Integer.valueOf(data[2]))) {
-					return;
-				}
-
-				int[]cords = Utils.transformCoords(Integer.valueOf(data[1]), Integer.valueOf(data[2]));
-				InputStream is = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
-				if(is == null) return;
-				SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
-				try {
-					sendPhoto(map);
-				} catch (TelegramApiException e) {
-					e.printStackTrace();
+					if(session.containsPlayer(fromId)) {
+						Country pl = session.getPlayerById(fromId);
+						String[] data = text.split(" ");
+						if(data.length!=3) {
+							return;
+						}
+						Cell toGo = new Cell(Integer.valueOf(data[1]), Integer.valueOf(data[2]));
+						
+						if(!pl.canGo(toGo.getX(),toGo.getY())) {
+							System.out.println("can't go");
+							return;
+						}
+						
+						pl.addCell(toGo);
+						
+						int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
+						InputStream is = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
+					
+						if(is == null) return;
+					
+						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
+						try {
+							sendPhoto(map);
+						} catch (TelegramApiException e) {
+							e.printStackTrace();
+						}
+					}else {
+						//not a player
+					}
+				}else {
+					//create new game first
 				}
 			}else if(text.toLowerCase().startsWith("/newsession")) {
-				GameSession ses = new GameSession(update.getMessage().getChatId());
-				
-				this.sessions.add(ses);
+				if(!Utils.containsSessionWithId(sessions, chatId)) {
+					GameSession ses = new GameSession(update.getMessage().getChatId());
+					this.sessions.add(ses);
+					System.out.println("added session "+chatId);
+				}
+			}else if(text.toLowerCase().startsWith("/joingame")) {
+				if(Utils.containsSessionWithId(sessions, chatId)) {
+					GameSession ses = Utils.getSessionById(sessions, chatId);
+					if(!ses.containsPlayer(fromId)) {
+						Random rnd = new Random();
+						rnd.setSeed(System.currentTimeMillis());
+						Cell sc = new Cell(rnd.nextInt(48),rnd.nextInt(30));
+						Country nc = new Country(fromId,"test",null,null,null,sc);
+						
+						ses.addPlayer(nc);
+						System.out.println("added player "+fromId+" to session "+chatId+" with starting pos '"+sc.getX()+"' & '"+sc.getY()+"'");
+						
+						int[]cords = Utils.transformCoords(sc.getX(), sc.getY());
+						InputStream is = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.GREEN);
+					
+						if(is == null) {
+							System.out.println("empty image");
+							return;
+						}
+					
+						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId());
+						try {
+							sendPhoto(map);
+						} catch (TelegramApiException e) {
+							e.printStackTrace();
+						}
+						
+					}else {
+						//already exists
+					}
+				}
 			}
 		}
 	}

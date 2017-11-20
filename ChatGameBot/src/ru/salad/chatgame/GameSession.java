@@ -21,6 +21,7 @@ public class GameSession {
 	private String mapName;
 	private BufferedImage map;
 	private Long[][] location;
+	private Country turn; 
 	
 	public GameSession(Long chatId, String map) {
 		this.chatId = chatId;
@@ -77,9 +78,23 @@ public class GameSession {
 		return this.map;
 	}
 	
+	public boolean containsPlayer(Integer id) {
+		for(Country co:this.players) {
+			if(co.getUserId()==id) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
-	
-	
+	public Country getPlayerById(Integer id) {
+		for(Country co:this.players) {
+			if(co.getUserId()==id) {
+				return co;
+			}
+		}
+		return null;
+	}
 	/** Adds player to playerlist.
 	 * 
 	 * @param co player to add
@@ -87,6 +102,9 @@ public class GameSession {
 	public void addPlayer(Country co) {
 		if(!this.players.contains(co)) {
 			this.players.add(co);
+		}
+		if(this.turn==null) {
+			this.turn = co;
 		}
 	}
 	/** Removes player from playerlist.

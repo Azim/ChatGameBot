@@ -64,7 +64,15 @@ public class Utils {
 			}
 		}
 		return null;
-		
+	}
+	
+	public static boolean containsSessionWithId(List<GameSession> sessions, Long id) {
+		for(GameSession session:sessions) {
+			if(session.getChatId().equals(id)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }
