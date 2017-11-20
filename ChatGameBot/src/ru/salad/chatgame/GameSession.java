@@ -143,6 +143,9 @@ public class GameSession {
 	 */
 	public boolean removePlayer(Country co) {
 		if(this.players.contains(co)) {
+			if(this.turn.getUserId()==co.getUserId()) {
+				this.nextTurn();
+			}
 			this.players.remove(co);
 			return true;
 		}

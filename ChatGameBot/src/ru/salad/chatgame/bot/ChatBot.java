@@ -115,7 +115,9 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 				
 				try {
-					execute(msg);
+					if(!msg.getText().isEmpty()) {
+						execute(msg);
+					}
 				} catch (TelegramApiException e) {
 					e.printStackTrace();
 				}
@@ -184,6 +186,22 @@ public class ChatBot extends TelegramLongPollingBot{
 					} catch (TelegramApiException e) {
 						e.printStackTrace();
 					}
+				}
+			}else if(text.toLowerCase().startsWith("/leavegame")) {
+				SendMessage msg = new SendMessage().setChatId(chatId).setText("Here are no running game right now, you can create new one using command '/newgame'").setReplyToMessageId(messageId);
+				if(Utils.containsSessionWithId(sessions, chatId)) {
+					GameSession ses = Utils.getSessionById(sessions, chatId);
+					if(ses.containsPlayer(fromId)) {
+						ses.removePlayer(ses.getPlayerById(fromId));
+						msg.setText("You have left the game");
+					}else {
+						msg.setText("You are not in the game yet");
+					}
+				}
+				try {
+					execute(msg);
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
 				}
 			}
 		}
