@@ -45,7 +45,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>ru.memeBot.Main</mainClass>
+              <mainClass>ru.salad.chatgame.Starter</mainClass>
             </manifest> 
           </archive>
         <outputEncoding>UTF-8</outputEncoding>
