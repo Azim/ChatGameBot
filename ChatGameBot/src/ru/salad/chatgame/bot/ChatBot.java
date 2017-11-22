@@ -145,7 +145,7 @@ public class ChatBot extends TelegramLongPollingBot{
 					if(!ses.containsPlayer(fromId)) {
 						Random rnd = new Random();
 						rnd.setSeed(System.currentTimeMillis());
-						Cell sc = new Cell(rnd.nextInt(48),rnd.nextInt(30));
+						Cell sc = new Cell(rnd.nextInt(30),rnd.nextInt(30));
 						Country nc = new Country(fromId,"test",null,null,null,sc);
 						
 						ses.addPlayer(nc);
@@ -218,14 +218,14 @@ public class ChatBot extends TelegramLongPollingBot{
 	}
 	
 	
-	private InputStream drawSymbol(GameSession s,int x, int y, Color color) {
+	private InputStream drawX(GameSession s,int x, int y, Color color) {
 		try {
 			BufferedImage img = s.getCurrentMap();
 
 			Graphics2D g = img.createGraphics();
 			g.setColor(color);
-			g.drawLine(x, y, x+26, y+23);
-			g.drawLine(x+26, y, x, y+23);
+			g.drawLine(x, y, x+21, y+21);
+			g.drawLine(x+21, y, x, y+21);
 			g.dispose();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			ImageIO.write(img, "jpg", os);
