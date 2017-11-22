@@ -90,7 +90,7 @@ public class ChatBot extends TelegramLongPollingBot{
 							int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
 							InputStream is = null;//drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
 							try {
-								session.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/2nd.jpg")));
+								session.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/2nd.png")));
 								is = session.getCurrentMapAsStream();
 							} catch (IOException e1) {
 								e1.printStackTrace();
@@ -115,7 +115,7 @@ public class ChatBot extends TelegramLongPollingBot{
 				}
 				
 				try {
-					if(!msg.getText().isEmpty()) {
+					if(!(msg.getText()==null||msg.getText().isEmpty())) {
 						execute(msg);
 					}
 				} catch (TelegramApiException e) {
@@ -154,7 +154,7 @@ public class ChatBot extends TelegramLongPollingBot{
 						int[]cords = Utils.transformCoords(sc.getX(), sc.getY());
 						InputStream is = null;// = drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.GREEN);
 						try {
-							ses.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/start.jpg")));
+							ses.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/1st.png")));
 							is = ses.getCurrentMapAsStream();
 						} catch (IOException e1) {
 							e1.printStackTrace();

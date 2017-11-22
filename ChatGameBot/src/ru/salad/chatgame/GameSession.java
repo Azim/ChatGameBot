@@ -26,7 +26,7 @@ public class GameSession {
 	public GameSession(Long chatId, String map) throws IOException {
 		this.chatId = chatId;
 		this.mapName = map;
-		this.location = new Long[48][30];
+		this.location = new Long[30][30];
 		for(int i=0;i<this.location.length;i++) {
 			for(int j=0;j<this.location[0].length;j++) {
 				location[i][j]=0L;
@@ -36,7 +36,7 @@ public class GameSession {
 	}
 	
 	public GameSession(Long chatId) throws IOException {
-		this(chatId,"map_basic.jpg");
+		this(chatId,"test.jpg");
 	}
 
 	public void nextTurn() {
@@ -85,6 +85,14 @@ public class GameSession {
 		ImageIO.write(this.getCurrentMap(), "jpg", os); 
 		InputStream is = new ByteArrayInputStream(os.toByteArray());
 		os.close();
+		return is;
+	}
+	
+	public InputStream renderAsStream() throws IOException {
+		InputStream is = null;
+		
+		
+		
 		return is;
 	}
 	
