@@ -9,13 +9,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -30,11 +34,13 @@ public class ChatBot extends TelegramLongPollingBot{
 	private final String botUsername;
 	private final String botToken;
 	private List<GameSession> sessions;
+	private Map<Long,List<Integer>> messagesToDelete;
 	
 	public ChatBot(String botUsername, String botToken) {
 		this.botUsername = botUsername;
 		this.botToken = botToken;
 		this.sessions = new ArrayList<GameSession>();
+		this.messagesToDelete = new HashMap<Long,List<Integer>>();
 	}
 
 	public ChatBot(Config config) {
@@ -99,7 +105,11 @@ public class ChatBot extends TelegramLongPollingBot{
 							SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("X: "+toGo.getX()+"\nY: "+toGo.getY());
 							session.nextTurn();
 							try {
-								sendPhoto(map);
+								delMessages(chatId);
+								Message sm = sendPhoto(map);
+								List<Integer> temp = this.messagesToDelete.get(chatId);
+								temp.add(sm.getMessageId());
+								this.messagesToDelete.put(chatId, temp);
 							} catch (TelegramApiException e) {
 								e.printStackTrace();
 							}
@@ -133,6 +143,7 @@ public class ChatBot extends TelegramLongPollingBot{
 						this.sessions.remove(Utils.getSessionById(sessions, chatId));
 						msg.setText("Game was reset!");
 					}
+					delMessages(chatId);
 					execute(msg);
 				} catch (IOException | TelegramApiException e) {
 					e.printStackTrace();
@@ -166,7 +177,11 @@ public class ChatBot extends TelegramLongPollingBot{
 					
 						SendPhoto map = new SendPhoto().setNewPhoto("map-"+update.getMessage().getChatId(), is).setChatId(update.getMessage().getChatId()).setCaption("Joined the game! your spawn location is:\nX: "+sc.getX()+"\nY: "+sc.getY()+"\n\nUse /go X Y to expand");
 						try {
-							sendPhoto(map);
+							delMessages(chatId);
+							Message sm = sendPhoto(map);
+							List<Integer> temp = this.messagesToDelete.get(chatId);
+							temp.add(sm.getMessageId());
+							this.messagesToDelete.put(chatId, temp);
 						} catch (TelegramApiException e) {
 							e.printStackTrace();
 						}
@@ -217,6 +232,19 @@ public class ChatBot extends TelegramLongPollingBot{
 		return this.botUsername;
 	}
 	
+	private void delMessages(Long chatId) {
+		List<Integer> msgs = this.messagesToDelete.get(chatId);
+		for(int mid:msgs) {
+			try {
+				DeleteMessage dm = new DeleteMessage(chatId, mid);
+				execute(dm);
+				Thread.sleep(300);
+			}catch(InterruptedException|TelegramApiException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
 	
 	private InputStream drawX(GameSession s,int x, int y, Color color) {
 		try {

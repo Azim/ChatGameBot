@@ -38,6 +38,10 @@ public class GameSession {
 		this.map = ImageIO.read(new File("images/"+map));
 	}
 	
+	public List<Player> getPlayers(){
+		return this.players;
+	}
+	
 	public GameSession(Long chatId) throws IOException {
 		this(chatId,"test.jpg");
 	}
