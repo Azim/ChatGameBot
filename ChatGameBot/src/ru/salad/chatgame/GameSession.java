@@ -13,25 +13,28 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import ru.salad.chatgame.util.Cell;
 import ru.salad.chatgame.util.Utils;
 
 public class GameSession {
-	private List<Country> players = new ArrayList<Country>();
+	private List<Player> players = new ArrayList<Player>();
 	private Long chatId;
 	private String mapName;
 	private BufferedImage map;
-	private Long[][] location;
-	private Country turn; 
+	private Integer[][] location;
+	private Player turn;
+	private int fullTurns; 
 	
 	public GameSession(Long chatId, String map) throws IOException {
 		this.chatId = chatId;
 		this.mapName = map;
-		this.location = new Long[30][30];
+		this.location = new Integer[30][30];
 		for(int i=0;i<this.location.length;i++) {
 			for(int j=0;j<this.location[0].length;j++) {
-				location[i][j]=0L;
+				location[i][j]=0;
 			}
 		}
+		this.fullTurns = 0;
 		this.map = ImageIO.read(new File("images/"+map));
 	}
 	
@@ -43,10 +46,20 @@ public class GameSession {
 		int currentIndex = this.players.indexOf(this.turn);
 		if(currentIndex+1 >= this.players.size()) {
 			currentIndex = 0;
+			this.fullTurns ++;
 		}else {
 			currentIndex++;
 		}
 		this.turn = this.players.get(currentIndex);
+	}
+	
+
+	public void go(Player pl, Cell toGo) {
+		this.location[toGo.getX()][toGo.getY()] = pl.getUserId();
+		pl.addCell(toGo);
+		int[]dataPixels = Utils.transformCoords(toGo.getX(),toGo.getY());
+		this.drawImageOnMap(dataPixels[0], dataPixels[1], pl.getIcon());
+		
 	}
 
 	/** Draws the new object above given image
@@ -58,9 +71,15 @@ public class GameSession {
 	 * @return input stream with image in it
 	 * @throws IOException
 	 */
-	public BufferedImage drawImageOnMap(int x, int y, Image icon) throws IOException {
+	public BufferedImage drawImageOnMap(int x, int y, Image icon) {
 		BufferedImage transparentWhite = Utils.makeWhiteTransparent(icon);
-		BufferedImage tmap = getCurrentMap();
+		BufferedImage tmap = null;
+		try {
+			tmap = getCurrentMap();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Unable to get current map");
+		}
 		
 		if(icon != null && x >= 0 && y >= 0 &&
 				(x+transparentWhite.getWidth()<
@@ -88,12 +107,25 @@ public class GameSession {
 		return is;
 	}
 	
-	public InputStream renderAsStream() throws IOException {
-		InputStream is = null;
-		
-		
-		
-		return is;
+	public void reDraw(){
+		for(int i=0;i<this.location.length;i++) {
+			for(int j=0;j<this.location[0].length;j++) {
+				if(location[i][j]==0) {
+					//empty
+					continue;
+				}
+				if(location[i][j]==1) {
+					//water
+					continue;
+				}
+				if(location[i][j]==2) {
+					//rock
+					continue;
+				}
+				int[]data = Utils.transformCoords(i, j);
+				drawImageOnMap(data[0], data[1], this.getPlayerById(location[i][j]).getIcon());
+			}
+		}
 	}
 	
 	/** Returns current map as BufferedImage; if not created, generates new one;
@@ -109,7 +141,7 @@ public class GameSession {
 	}
 	
 	public boolean containsPlayer(Integer id) {
-		for(Country co:this.players) {
+		for(Player co:this.players) {
 			if(co.getUserId()==id) {
 				return true;
 			}
@@ -117,15 +149,15 @@ public class GameSession {
 		return false;
 	}
 	
-	public Country getCurrentTurn() {
+	public Player getCurrentTurn() {
 		if(this.turn == null&&!this.players.isEmpty()) {
 			this.turn = this.players.get(0);
 		}
 		return this.turn;
 	}
 	
-	public Country getPlayerById(Integer id) {
-		for(Country co:this.players) {
+	public Player getPlayerById(Integer id) {
+		for(Player co:this.players) {
 			if(co.getUserId()==id) {
 				return co;
 			}
@@ -136,7 +168,7 @@ public class GameSession {
 	 * 
 	 * @param co player to add
 	 */
-	public void addPlayer(Country co) {
+	public void addPlayer(Player co) {
 		if(!this.players.contains(co)) {
 			this.players.add(co);
 		}
@@ -149,7 +181,7 @@ public class GameSession {
 	 * @param co player toremove
 	 * @return false if player not found, otherwise - true;
 	 */
-	public boolean removePlayer(Country co) {
+	public boolean removePlayer(Player co) {
 		if(this.players.contains(co)) {
 			if(this.turn.getUserId()==co.getUserId()) {
 				this.nextTurn();
@@ -166,4 +198,9 @@ public class GameSession {
 	public Long getChatId() {
 		return this.chatId;
 	}
+	
+	public int getFullTurns() {
+		return this.fullTurns;
+	}
+
 }

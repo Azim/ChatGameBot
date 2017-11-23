@@ -1,15 +1,18 @@
 package ru.salad.chatgame;
 
 import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
+
+import javax.imageio.ImageIO;
 
 import ru.salad.chatgame.abilities.ActiveAbility;
 import ru.salad.chatgame.abilities.PassiveAbility;
 import ru.salad.chatgame.util.Cell;
 
-public class Country {
+public class Player {
 	private int userId;
 	private String name;
 	private Image icon;//TODO: find out that will be saved as icon
@@ -17,7 +20,7 @@ public class Country {
 	private List<PassiveAbility> passiveAbilities;
 	private List<Cell> cells;
 	
-	public Country(int userId, String name, Image icon, List<ActiveAbility> activeAbilities,
+	public Player(int userId, String name, Image icon, List<ActiveAbility> activeAbilities,
 			List<PassiveAbility> passiveAbilities, Cell startingCell) {
 		this.userId = userId;
 		this.name = name;
@@ -26,6 +29,24 @@ public class Country {
 		this.passiveAbilities = passiveAbilities;
 		this.cells = new ArrayList<Cell>();
 		this.cells.add(startingCell);
+	}
+	
+	public Player(int userId, String name, List<ActiveAbility> activeAbilities,
+			List<PassiveAbility> passiveAbilities, Cell startingCell) {
+		this(userId,name,null,activeAbilities,passiveAbilities,startingCell);
+		try {
+			File iFile = new File("images/"+name+".png");
+			if(!iFile.exists()) {
+				iFile = new File("images/2nd.png");
+			}
+			if(!iFile.exists()) {
+				iFile = null;
+			}
+			Image icon = ImageIO.read(iFile);
+			this.icon = icon;
+		} catch (IOException e) {
+			System.err.println("unable to generate default user image");
+		}
 	}
 	
 	public boolean canGo(int x2, int y2) {
@@ -77,6 +98,15 @@ public class Country {
 	}
 
 	public Image getIcon() {
+		if(this.icon==null) {
+			try {
+				this.icon = ImageIO.read(new File("images/"+this.getName()));
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("unable to generate default player icon");
+			}
+		}
+		
 		return icon;
 	}
 

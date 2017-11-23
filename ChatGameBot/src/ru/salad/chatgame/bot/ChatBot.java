@@ -20,7 +20,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import ru.salad.chatgame.Country;
+import ru.salad.chatgame.Player;
 import ru.salad.chatgame.GameSession;
 import ru.salad.chatgame.util.Cell;
 import ru.salad.chatgame.util.Config;
@@ -71,7 +71,7 @@ public class ChatBot extends TelegramLongPollingBot{
 				
 					if(session.containsPlayer(fromId)) {
 						if(session.getCurrentTurn().getUserId()==fromId) {
-							Country pl = session.getPlayerById(fromId);
+							Player pl = session.getPlayerById(fromId);
 							String[] data = text.split(" ");
 							if(data.length<3) {
 								return;
@@ -84,13 +84,12 @@ public class ChatBot extends TelegramLongPollingBot{
 								msg.setText("Can't go there!");
 								return;
 							}
+							
 						
-							pl.addCell(toGo);
-						
-							int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
+							//int[]cords = Utils.transformCoords(toGo.getX(),toGo.getY());
 							InputStream is = null;//drawSymbol(Utils.getSessionById(this.sessions, update.getMessage().getChatId()),cords[0],cords[1],Color.red);
 							try {
-								session.drawImageOnMap(cords[0], cords[1], ImageIO.read(new File("images/2nd.png")));
+								session.go(pl,toGo);
 								is = session.getCurrentMapAsStream();
 							} catch (IOException e1) {
 								e1.printStackTrace();
@@ -139,14 +138,15 @@ public class ChatBot extends TelegramLongPollingBot{
 					e.printStackTrace();
 				}
 				
-			}else if(text.toLowerCase().startsWith("/joingame")) {
+			}else if(text.toLowerCase().startsWith("/joingame")&&text.split(" ").length==2) {
 				if(Utils.containsSessionWithId(sessions, chatId)) {
 					GameSession ses = Utils.getSessionById(sessions, chatId);
 					if(!ses.containsPlayer(fromId)) {
+						String name = text.split(" ")[1];
 						Random rnd = new Random();
 						rnd.setSeed(System.currentTimeMillis());
 						Cell sc = new Cell(rnd.nextInt(30),rnd.nextInt(30));
-						Country nc = new Country(fromId,"test",null,null,null,sc);
+						Player nc = new Player(fromId,name,null,null,sc);
 						
 						ses.addPlayer(nc);
 						System.out.println("added player "+fromId+" to session "+chatId+" with starting pos '"+sc.getX()+"' & '"+sc.getY()+"'");
