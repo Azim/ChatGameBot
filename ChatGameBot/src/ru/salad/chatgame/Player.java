@@ -48,8 +48,15 @@ public class Player {
 			System.err.println("unable to generate default user image");
 		}
 	}
-	
-	public boolean canGo(int x2, int y2) {
+	/** checks if player can move to specified location
+	 * 
+	 * @param xc x coord
+	 * @param yc y coord
+	 * @return boolean
+	 */
+	public boolean canGo(int xc, int yc) {
+		int x2 = xc;
+		int y2 = yc;
 		if(x2<0||y2<0||x2>29||y2>29) {
 			return false;
 		}
@@ -88,7 +95,19 @@ public class Player {
 		}
 		return false;
 	}
-
+	/** checks if player can move to specified location
+	 * 
+	 * @param loc
+	 * @return boolean
+	 */
+	public boolean canGo(Cell loc) {
+		return canGo(loc.getX(),loc.getY());
+	}
+	
+	/** gets player's name
+	 * 
+	 * @return String
+	 */
 	public String getName() {
 		return name;
 	}

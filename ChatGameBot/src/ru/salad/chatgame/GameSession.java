@@ -37,15 +37,22 @@ public class GameSession {
 		this.fullTurns = 0;
 		this.map = ImageIO.read(new File("images/"+map));
 	}
+
+	public GameSession(Long chatId) throws IOException {
+		this(chatId,"test.jpg");
+	}
 	
+	/** Returns list of players in session
+	 * 
+	 * @return List<Player> players
+	 */
 	public List<Player> getPlayers(){
 		return this.players;
 	}
 	
-	public GameSession(Long chatId) throws IOException {
-		this(chatId,"test.jpg");
-	}
-
+	/** Changes the current turn, usually fired after player moves or skips;
+	 * 
+	 */
 	public void nextTurn() {
 		int currentIndex = this.players.indexOf(this.turn);
 		if(currentIndex+1 >= this.players.size()) {
@@ -57,7 +64,11 @@ public class GameSession {
 		this.turn = this.players.get(currentIndex);
 	}
 	
-
+	/** Draws player's icon at the given cell
+	 * 
+	 * @param pl player
+	 * @param toGo cell where to go
+	 */
 	public void go(Player pl, Cell toGo) {
 		this.location[toGo.getX()][toGo.getY()] = pl.getUserId();
 		pl.addCell(toGo);
@@ -111,6 +122,10 @@ public class GameSession {
 		return is;
 	}
 	
+	@Deprecated
+	/** completely redraws the game location 'from scratch'; debug function
+	 * 
+	 */
 	public void reDraw(){
 		for(int i=0;i<this.location.length;i++) {
 			for(int j=0;j<this.location[0].length;j++) {
@@ -144,6 +159,11 @@ public class GameSession {
 		return this.map;
 	}
 	
+	/** checks if player exist in current session
+	 * 
+	 * @param id player's id
+	 * @return boolean result
+	 */
 	public boolean containsPlayer(Integer id) {
 		for(Player co:this.players) {
 			if(co.getUserId()==id) {
@@ -152,7 +172,10 @@ public class GameSession {
 		}
 		return false;
 	}
-	
+	/** gets current turn's player
+	 * 
+	 * @return Player
+	 */
 	public Player getCurrentTurn() {
 		if(this.turn == null&&!this.players.isEmpty()) {
 			this.turn = this.players.get(0);
@@ -160,6 +183,11 @@ public class GameSession {
 		return this.turn;
 	}
 	
+	/** gets player with specified id from current session
+	 * 
+	 * @param id player's id
+	 * @return Player
+	 */
 	public Player getPlayerById(Integer id) {
 		for(Player co:this.players) {
 			if(co.getUserId()==id) {
@@ -203,6 +231,10 @@ public class GameSession {
 		return this.chatId;
 	}
 	
+	/** Gets amount of full turns
+	 * 
+	 * @return int fullTurns
+	 */
 	public int getFullTurns() {
 		return this.fullTurns;
 	}

@@ -232,6 +232,10 @@ public class ChatBot extends TelegramLongPollingBot{
 		return this.botUsername;
 	}
 	
+	/** Deletes messages with outdated map
+	 * 
+	 * @param chatId the chat where messages will be removed
+	 */
 	private void delMessages(Long chatId) {
 		List<Integer> msgs = this.messagesToDelete.get(chatId);
 		for(int mid:msgs) {
@@ -246,6 +250,16 @@ public class ChatBot extends TelegramLongPollingBot{
 		
 	}
 	
+
+	@Deprecated
+	/** Debug function to draw X symbol on the specific cell
+	 * 
+	 * @param s session
+	 * @param x 
+	 * @param y
+	 * @param color 
+	 * @return
+	 */
 	private InputStream drawX(GameSession s,int x, int y, Color color) {
 		try {
 			BufferedImage img = s.getCurrentMap();
